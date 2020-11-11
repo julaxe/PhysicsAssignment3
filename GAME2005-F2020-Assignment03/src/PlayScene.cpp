@@ -14,24 +14,22 @@ PlayScene::~PlayScene()
 void PlayScene::draw()
 {
 	drawDisplayList();
+	m_pBulletPool->Draw();
 }
 
 void PlayScene::update()
 {
 	updateDisplayList();
-	//distance Label
-	if (m_pPlayer->checkDistance(m_pEnemy) <= (m_pPlayer->getHeight() * 0.5f + m_pEnemy->getHeight() * 0.5f))
+	m_pBulletPool->Update();
+	m_pBulletPool->checkCollision(m_pPlayer);
+	const float deltaTime = 1.0f / 60.f;
+	
+	if(timer >= 0.1f) // 3 seconds
 	{
-		m_pDistanceLabel->setText("Distance = HIT!!!    " );
+		timer = 0;
+		m_pBulletPool->Use();
 	}
-	else {
-
-		m_pDistanceLabel->setText("Distance = " + std::to_string(m_pPlayer->checkDistance(m_pEnemy)));
-	}
-	//Velocity Label
-	m_pVelocityLabel->setText("Velocity = " + std::to_string(Util::magnitude(m_pPlayer->getRigidBody()->velocity)));
-
-
+	timer += deltaTime;
 }
 
 void PlayScene::clean()
@@ -81,21 +79,12 @@ void PlayScene::handleEvents()
 
 void PlayScene::start()
 {
+	timer = 0;
 	// Player Sprite
 	m_pPlayer = new Player();
 	addChild(m_pPlayer);
+
+	// Bullet Pool
+	m_pBulletPool = new BulletPool(10);
 	
-	// Enemy Sprite
-	m_pEnemy = new Enemy();
-	addChild(m_pEnemy);
-
-	// Label
-	const SDL_Color blue = { 0, 0, 255, 255 };
-	m_pDistanceLabel = new Label("Distance", "Consolas", 40, blue, glm::vec2(400.0f, 40.0f));
-	m_pDistanceLabel->setParent(this);
-	addChild(m_pDistanceLabel);
-
-	m_pVelocityLabel = new Label("Velocity", "Consolas", 40, blue, glm::vec2(400.0f, 80.0f));
-	m_pVelocityLabel->setParent(this);
-	addChild(m_pVelocityLabel);
 }

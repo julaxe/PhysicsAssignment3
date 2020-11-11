@@ -3,10 +3,8 @@
 #define __PLAY_SCENE__
 
 #include "Scene.h"
-#include "Plane.h"
 #include "Player.h"
-#include "Button.h"
-#include "Enemy.h"
+#include "BulletPool.h"
 
 class PlayScene : public Scene
 {
@@ -21,16 +19,13 @@ public:
 	virtual void handleEvents() override;
 	virtual void start() override;
 private:
+	
 	glm::vec2 m_mousePosition;
 
-	Plane* m_pPlaneSprite;
 	Player* m_pPlayer;
-	Enemy* m_pEnemy;
-	Label* m_pDistanceLabel;
-	Label* m_pVelocityLabel;
+	BulletPool* m_pBulletPool;
 
-	Button* m_pBackButton;
-	Button* m_pNextButton;
+	float timer;
 };
 
 #endif /* defined (__PLAY_SCENE__) */
