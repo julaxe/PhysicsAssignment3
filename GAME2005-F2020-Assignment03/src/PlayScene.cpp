@@ -1,6 +1,11 @@
 #include "PlayScene.h"
+
+#include <imgui_sdl.h>
+#include "imgui.h"
+
 #include "Game.h"
 #include "EventManager.h"
+#include "Renderer.h"
 #include "Util.h"
 
 PlayScene::PlayScene()
@@ -13,8 +18,21 @@ PlayScene::~PlayScene()
 
 void PlayScene::draw()
 {
+	
+	if(*showBackground)
+		TextureManager::Instance()->draw("background", 0.0f, 0.0f);
+	
+	
 	drawDisplayList();
+	
+	
 	m_pBulletPool->Draw();
+	
+	if (EventManager::Instance().isIMGUIActive())
+	{
+		GUI_Function();
+	}
+
 }
 
 void PlayScene::update()
@@ -24,7 +42,7 @@ void PlayScene::update()
 	m_pBulletPool->checkCollision(m_pPlayer);
 	const float deltaTime = 1.0f / 60.f;
 	
-	if(timer >= 0.1f) // 3 seconds
+	if(timer >= *m_paramsImGui->timeToRespawn) // 0.1 seconds
 	{
 		timer = 0;
 		m_pBulletPool->Use();
@@ -79,6 +97,12 @@ void PlayScene::handleEvents()
 
 void PlayScene::start()
 {
+	showBackground = new bool(true);
+	//background
+	TextureManager::Instance()->load("../Assets/sprites/backgroundA2.png", "background");
+
+	//ImGUI params
+	m_paramsImGui = new ParamsIMGUI(0.1, 10);
 	timer = 0;
 	// Player Sprite
 	m_pPlayer = new Player();
@@ -87,4 +111,34 @@ void PlayScene::start()
 	// Bullet Pool
 	m_pBulletPool = new BulletPool(10);
 	
+}
+
+void PlayScene::GUI_Function() const
+{
+	
+	// Always open with a NewFrame
+	ImGui::NewFrame();
+	// See examples by uncommenting the following - also look at imgui_demo.cpp in the IMGUI filter
+	//ImGui::ShowDemoWindow();
+	
+	ImGui::Begin("Physics Simulation Controls", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar);
+	ImGui::Text("1 pixel is 1 meter");
+	ImGui::Separator();
+	if(ImGui::Button("Background"))
+	{
+		*showBackground = !(*showBackground);
+	}
+	ImGui::DragFloat("Delay", m_paramsImGui->timeToRespawn,0.01f,0.01f, 3.f);
+	if(ImGui::InputInt("Pool Size", m_paramsImGui->newSizePool))
+	{
+		m_pBulletPool->SetNewSize(*m_paramsImGui->newSizePool);
+	}
+	
+	ImGui::End();
+
+	// Don't Remove this
+	ImGui::Render();
+	ImGuiSDL::Render(ImGui::GetDrawData());
+	ImGui::StyleColorsDark();
+
 }

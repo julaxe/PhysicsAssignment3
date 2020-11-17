@@ -64,10 +64,27 @@ public:
 			if(List->getArray()[i]->Used())
 			{
 				if(Player->checkDistance(List->getArray()[i]) < 
-					(Player->getHeight()*0.5 + List->getArray()[i]->getHeight()*0.5))
+					(Player->getHeight()*0.3 + List->getArray()[i]->getHeight()*0.5))
 				{
 					List->getArray()[i]->isNotUsed();
 				}
+			}
+		}
+	}
+
+	void SetNewSize(int newSize)
+	{
+		if(newSize> GetSize())
+		{
+			for (int i = 0; i < newSize - GetSize(); i++)
+			{
+				List->push(new Bullet());
+			}
+		}else if(newSize< GetSize())
+		{
+			for (int i = 0; i < GetSize() - newSize; i++)
+			{
+				List->pop();
 			}
 		}
 	}

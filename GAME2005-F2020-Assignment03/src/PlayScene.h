@@ -6,6 +6,17 @@
 #include "Player.h"
 #include "BulletPool.h"
 
+struct ParamsIMGUI
+{
+	ParamsIMGUI(float time, int newSize)
+	{
+		timeToRespawn = new float(time);
+		newSizePool = new int(newSize);
+	}
+	float* timeToRespawn;
+	int* newSizePool;
+};
+
 class PlayScene : public Scene
 {
 public:
@@ -19,12 +30,17 @@ public:
 	virtual void handleEvents() override;
 	virtual void start() override;
 private:
+	// IMGUI Function
+	void GUI_Function() const;
+	bool* showBackground;
 	
 	glm::vec2 m_mousePosition;
 
 	Player* m_pPlayer;
 	BulletPool* m_pBulletPool;
 
+	ParamsIMGUI* m_paramsImGui;
+	
 	float timer;
 };
 
