@@ -5,6 +5,7 @@
 #include "Scene.h"
 #include "Player.h"
 #include "BulletPool.h"
+#include "GenericPolygon.h"
 
 struct ParamsIMGUI
 {
@@ -33,11 +34,13 @@ private:
 	// IMGUI Function
 	void GUI_Function() const;
 	bool* showBackground;
+	int* m_pNumberVertices;
 	
 	glm::vec2 m_mousePosition;
 
 	Player* m_pPlayer;
 	BulletPool* m_pBulletPool;
+	GenericPolygon* m_GenPolygon;
 
 	ParamsIMGUI* m_paramsImGui;
 	

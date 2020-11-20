@@ -269,5 +269,8 @@
     <ClInclude Include="..\include\IMGUI_SDL\imgui_sdl.h">
       <Filter>IMGUI</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\GenericPolygon.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

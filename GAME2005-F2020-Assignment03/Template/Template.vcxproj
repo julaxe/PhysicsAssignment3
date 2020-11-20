@@ -205,6 +205,7 @@
     <ClInclude Include="..\src\CollisionShape.h" />
     <ClInclude Include="..\src\Config.h" />
     <ClInclude Include="..\src\Bullet.h" />
+    <ClInclude Include="..\src\GenericPolygon.h" />
     <ClInclude Include="..\src\SoundType.h" />
     <ClInclude Include="..\src\Sprite.h" />
     <ClInclude Include="..\src\UIControl.h" />

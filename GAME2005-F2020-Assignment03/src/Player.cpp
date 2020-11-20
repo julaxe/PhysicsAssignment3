@@ -47,12 +47,15 @@ void Player::update()
 		}
 	}
 
+		
 		getRigidBody()->velocity += getRigidBody()->acceleration;
+		
 		glm::vec2 pos = getTransform()->position;
 		pos.x += getRigidBody()->velocity.x * deltaTime;
 		pos.y += getRigidBody()->velocity.y * deltaTime;
 
-		getTransform()->position = pos; 
+		getTransform()->position = pos;
+		checkBordersOfScreen();
 }
 
 void Player::clean()
@@ -93,4 +96,37 @@ float Player::checkDistance(GameObject* pGameObject) {
 	float a = pGameObject->getTransform()->position.x - getTransform()->position.x;
 	float b = pGameObject->getTransform()->position.y - getTransform()->position.y;
 	return sqrt(a*a + b*b);
+}
+
+bool Player::checkBordersOfScreen()
+{
+	//top
+	if(getTransform()->position.y - getHeight()*0.5 < 0)
+	{
+		getTransform()->position.y = getHeight()*0.5;
+		getRigidBody()->velocity = glm::vec2(0.0f, 0.0f);
+		getRigidBody()->acceleration = glm::vec2(0.0f, 0.0f);
+		return true;
+	}
+	//down
+	if(getTransform()->position.y + getHeight()*0.5 > Config::SCREEN_HEIGHT)
+	{
+		getTransform()->position.y = Config::SCREEN_HEIGHT - getHeight()*0.5;
+		getRigidBody()->velocity = glm::vec2(0.0f, 0.0f);
+		getRigidBody()->acceleration = glm::vec2(0.0f, 0.0f);
+		return true;
+	}
+	//left
+	if(getTransform()->position.x < 0)
+	{
+		getTransform()->position.x = Config::SCREEN_WIDTH;
+		return true;
+	}
+	//right
+	if(getTransform()->position.x > Config::SCREEN_WIDTH)
+	{
+		getTransform()->position.x = 0;
+		return true;
+	}
+	return false;
 }

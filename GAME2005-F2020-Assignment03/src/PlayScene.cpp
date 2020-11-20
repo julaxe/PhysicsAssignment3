@@ -24,7 +24,8 @@ void PlayScene::draw()
 	
 	
 	drawDisplayList();
-	
+
+	m_GenPolygon->Draw();
 	
 	m_pBulletPool->Draw();
 	
@@ -108,6 +109,9 @@ void PlayScene::start()
 	m_pPlayer = new Player();
 	addChild(m_pPlayer);
 
+	m_pNumberVertices = new int(3);
+	m_GenPolygon = new GenericPolygon(*m_pNumberVertices,50);
+
 	// Bullet Pool
 	m_pBulletPool = new BulletPool(10);
 	
@@ -133,7 +137,11 @@ void PlayScene::GUI_Function() const
 	{
 		m_pBulletPool->SetNewSize(*m_paramsImGui->newSizePool);
 	}
-	
+
+	if(ImGui::InputInt("Polygon", m_pNumberVertices))
+	{
+		m_GenPolygon->ChangePolygon(*m_pNumberVertices);
+	}
 	ImGui::End();
 
 	// Don't Remove this

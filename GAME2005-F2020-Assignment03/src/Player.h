@@ -24,9 +24,10 @@ public:
 	void moveStopY();
 
 	float checkDistance(GameObject* pGameObject);
+	bool checkBordersOfScreen();
 
 private:
-	const float ACELLERATION = 10.0f;
+	const float ACELLERATION = 20.0f;
 	glm::vec2 m_direction; 
 };
 
