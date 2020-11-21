@@ -123,6 +123,12 @@
     <ClCompile Include="..\include\IMGUI_SDL\imgui_sdl.cpp">
       <Filter>IMGUI</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Brick.cpp">
+      <Filter>Game Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\BouncingScene.cpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\StartScene.h">
@@ -271,6 +277,12 @@
     </ClInclude>
     <ClInclude Include="..\src\GenericPolygon.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\BouncingScene.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Brick.h">
+      <Filter>Game Objects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

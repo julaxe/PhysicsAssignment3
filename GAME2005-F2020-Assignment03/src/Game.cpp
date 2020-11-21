@@ -7,6 +7,7 @@
 #include "EventManager.h"
 
 // IMGUI Includes
+#include "BouncingScene.h"
 #include "imgui.h"
 #include "imgui_sdl.h"
 
@@ -157,6 +158,10 @@ void Game::changeSceneState(const SceneState new_state)
 		case PLAY_SCENE:
 			m_currentScene = new PlayScene();
 			std::cout << "play scene activated" << std::endl;
+			break;
+		case BOUNCING_SCENE:
+			m_currentScene = new BouncingScene();
+			std::cout << "bouncing scene activated" << std::endl;
 			break;
 		case END_SCENE:
 			m_currentScene = new EndScene();

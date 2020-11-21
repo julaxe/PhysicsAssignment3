@@ -30,17 +30,14 @@ public:
 	virtual void clean() override;
 	virtual void handleEvents() override;
 	virtual void start() override;
+
 private:
 	// IMGUI Function
 	void GUI_Function() const;
-	bool* showBackground;
-	int* m_pNumberVertices;
 	
-	glm::vec2 m_mousePosition;
 
 	Player* m_pPlayer;
 	BulletPool* m_pBulletPool;
-	GenericPolygon* m_GenPolygon;
 
 	ParamsIMGUI* m_paramsImGui;
 	

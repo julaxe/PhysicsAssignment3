@@ -2,6 +2,7 @@
 #include "glm/vec2.hpp"
 #include "UnOrderedArray.h"
 #include "Util.h"
+#include "Config.h"
 //360 / N of vertices.
 
 class GenericPolygon
@@ -47,6 +48,11 @@ public:
 			GenerateVertices();
 			UpdateVerticesPosition();
 		}
+	}
+
+	UnorderedArray<glm::vec2>* GetVertices()
+	{
+		return Vertices;
 	}
 	
 private:

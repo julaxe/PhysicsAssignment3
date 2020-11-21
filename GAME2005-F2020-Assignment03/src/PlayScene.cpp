@@ -18,14 +18,10 @@ PlayScene::~PlayScene()
 
 void PlayScene::draw()
 {
-	
-	if(*showBackground)
-		TextureManager::Instance()->draw("background", 0.0f, 0.0f);
-	
+	TextureManager::Instance()->draw("background", 0.0f, 0.0f);
 	
 	drawDisplayList();
 
-	m_GenPolygon->Draw();
 	
 	m_pBulletPool->Draw();
 	
@@ -33,7 +29,6 @@ void PlayScene::draw()
 	{
 		GUI_Function();
 	}
-
 }
 
 void PlayScene::update()
@@ -98,7 +93,6 @@ void PlayScene::handleEvents()
 
 void PlayScene::start()
 {
-	showBackground = new bool(true);
 	//background
 	TextureManager::Instance()->load("../Assets/sprites/backgroundA2.png", "background");
 
@@ -108,9 +102,7 @@ void PlayScene::start()
 	// Player Sprite
 	m_pPlayer = new Player();
 	addChild(m_pPlayer);
-
-	m_pNumberVertices = new int(3);
-	m_GenPolygon = new GenericPolygon(*m_pNumberVertices,50);
+	
 
 	// Bullet Pool
 	m_pBulletPool = new BulletPool(10);
@@ -122,25 +114,23 @@ void PlayScene::GUI_Function() const
 	
 	// Always open with a NewFrame
 	ImGui::NewFrame();
-	// See examples by uncommenting the following - also look at imgui_demo.cpp in the IMGUI filter
-	//ImGui::ShowDemoWindow();
 	
 	ImGui::Begin("Physics Simulation Controls", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar);
 	ImGui::Text("1 pixel is 1 meter");
+	
 	ImGui::Separator();
-	if(ImGui::Button("Background"))
-	{
-		*showBackground = !(*showBackground);
-	}
 	ImGui::DragFloat("Delay", m_paramsImGui->timeToRespawn,0.01f,0.01f, 3.f);
 	if(ImGui::InputInt("Pool Size", m_paramsImGui->newSizePool))
 	{
 		m_pBulletPool->SetNewSize(*m_paramsImGui->newSizePool);
 	}
 
-	if(ImGui::InputInt("Polygon", m_pNumberVertices))
+	
+	
+	ImGui::Separator();
+	if(ImGui::Button("Level 2"))
 	{
-		m_GenPolygon->ChangePolygon(*m_pNumberVertices);
+		TheGame::Instance()->changeSceneState(BOUNCING_SCENE);
 	}
 	ImGui::End();
 
@@ -149,4 +139,5 @@ void PlayScene::GUI_Function() const
 	ImGuiSDL::Render(ImGui::GetDrawData());
 	ImGui::StyleColorsDark();
 
+	
 }
