@@ -1,6 +1,6 @@
 #pragma once
-#include "glm/vec2.hpp"
-#include "glm/vec4.hpp"
+#include "Line.h"
+#include "UnOrderedArray.h"
 
 class Brick
 {
@@ -10,19 +10,21 @@ public:
 
 	void Draw();
 	void Update();
-	
-	void GenerateVertices();
-	void UpdateVerticesPosition();
 
 	void SetPosition(glm::vec2 newPos);
-
 	glm::vec2* GetVertices();
 	void SetColor(glm::vec4 newColor);
+	UnorderedArray<Line>& getLines();
+private:
 	
+	void GenerateVertices();
+	void GenerateLines();
+	void UpdateLinesPoisition();
 private:
 	glm::vec4 color;
 	float height;
 	float width;
 	glm::vec2 Position;
 	glm::vec2* Vertices;
+	UnorderedArray<Line>* lines;
 };

@@ -284,5 +284,8 @@
     <ClInclude Include="..\src\Brick.h">
       <Filter>Game Objects</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Line.h">
+      <Filter>Game Objects</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

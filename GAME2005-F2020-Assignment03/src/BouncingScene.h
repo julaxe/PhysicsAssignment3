@@ -16,6 +16,8 @@ public:
 	virtual void start() override;
 
 	void checkCollision();
+	void CollisionPointAlg(Line line1, Line line2);
+	glm::vec2 CollisionPoint(Line line1, Line line2);
 private:
 	// IMGUI Function
 	void GUI_Function() const;
@@ -23,6 +25,7 @@ private:
 	
 	Brick* m_pBrick;
 	GenericPolygon* m_GenPolygon;
+	UnorderedArray<glm::vec2>* CollisionPoints;
 	int* m_pNumberVertices;
 
 };
