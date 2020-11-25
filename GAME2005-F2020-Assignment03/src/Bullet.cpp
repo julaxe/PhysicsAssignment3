@@ -3,7 +3,7 @@
 #include "Util.h"
 
 Bullet::Bullet() {
-	TextureManager::Instance()->load("../Assets/textures/bullet.png", "Bullet");
+	TextureManager::Instance()->load("../Assets/textures/nut.png", "Bullet");
 
 	auto size = TextureManager::Instance()->getTextureSize("Bullet");
 	setWidth(size.x);
