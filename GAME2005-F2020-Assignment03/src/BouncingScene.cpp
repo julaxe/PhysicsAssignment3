@@ -28,9 +28,10 @@ void BouncingScene::draw()
 
 	m_pBrick->Draw();
 	m_GenPolygon->Draw();
+	Util::DrawLine(m_pMousePos[0], m_pMousePos[1], {1,0,0,1});
 	for (int i = 0; i < CollisionPoints->GetSize(); i++)
 	{
-		Util::DrawCircle((*CollisionPoints)[i], 10, {0,0,0,1});
+		Util::DrawCircle((*CollisionPoints)[i].Position, 10, {0,0,0,1});
 	}
 
 	if (EventManager::Instance().isIMGUIActive())
@@ -41,7 +42,33 @@ void BouncingScene::draw()
 
 void BouncingScene::update()
 {
-	checkCollision();
+	CollisionPoints->clear();
+	
+	if(checkCollision(m_pBrick->getLines(), m_GenPolygon->getLines()))
+	{
+		for (int i = 0; i < CollisionPoints->GetSize(); i++)
+		{
+			BounceWithCollisionLines((*CollisionPoints)[i], true);
+		}
+		
+		
+		//add velocity
+		glm::vec2 velocityBrick = (m_pMousePos[0] - m_pMousePos[1])/(1.f/60.f);
+		m_GenPolygon->addVelocity(velocityBrick);
+		m_pBrick->ReadyToCollide() = false;
+	}
+	CollisionPoints->clear();
+	
+	if(checkCollision(m_borders->getLines(), m_GenPolygon->getLines()))
+	{
+		for (int i = 0; i < CollisionPoints->GetSize(); i++)
+		{
+			BounceWithCollisionLines((*CollisionPoints)[i], false);
+		}
+	}
+
+	m_pBrick->Update();
+	m_GenPolygon->Update();
 }
 
 void BouncingScene::clean()
@@ -69,69 +96,55 @@ void BouncingScene::start()
 	TextureManager::Instance()->load("../Assets/sprites/backgroundA2.png", "background");
 	m_pMousePos = new glm::vec2[2];
 	m_pBrick = new Brick();
-	m_pNumberVertices = new int(3);
+	m_pNumberVertices = new int(4);
 	m_GenPolygon = new GenericPolygon(*m_pNumberVertices,50);
-	CollisionPoints = new UnorderedArray<glm::vec2>(3);
+	m_borders = new Borders();
+	CollisionPoints = new UnorderedArray<CPoints>(3);
+	Absorbtion = new float(0.9f);
 }
 
-void BouncingScene::checkCollision() //Line by Line
+void BouncingScene::BounceWithCollisionLines(CPoints collisionPoint, bool isBrick)
 {
-	CollisionPoints->clear();
+	if(isBrick)
+	{
+		m_GenPolygon->FixPosition(collisionPoint.Line, m_pBrick);
+		m_GenPolygon->Bounce(*Absorbtion, collisionPoint.Line);
+	}else
+	{
+		m_GenPolygon->FixPosition(collisionPoint.Line);
+		m_GenPolygon->Bounce(*Absorbtion, collisionPoint.Line);
+	}
+}
+
+bool BouncingScene::checkCollision(UnorderedArray<Line>& lines1, UnorderedArray<Line>& lines2) //Line by Line
+{
+	bool collision = false;
 	m_GenPolygon->ResetColor();
 	for (int i = 0; i < 4; i++) //every line of the brick
 	{
 		bool LineColliding = false; // bool for every Brick Line Color
 		for (int k = 0; k < *m_pNumberVertices; k++)
 		{
-			if(CollisionManager::lineLineCheck(m_pBrick->getLines()[i].Start(),
-				m_pBrick->getLines()[i].End(),
-				m_GenPolygon->getLines()[k].Start(),
-				m_GenPolygon->getLines()[k].End()))
+			if(CollisionManager::lineLineCheck(lines1[i].Start(),
+				lines1[i].End(),
+				lines2[k].Start(),
+				lines2[k].End()))
 			{
-				m_GenPolygon->getLines()[k].Color() = {1,0,0,1}; //Turn Red
+				lines2[k].Color() = {1,0,0,1}; //Turn Red
+				collision = true;
 				LineColliding = true;
 				//Check exactly position
-				CollisionPoints->push(CollisionPoint(m_pBrick->getLines()[i],m_GenPolygon->getLines()[k]));
+				CollisionPoints->push(CPoints(CollisionPoint(lines1[i],lines2[k]), i));
+				break;
 			}
 		}
 		
 		if(LineColliding)
-			m_pBrick->getLines()[i].Color() = {1,0,0,1}; //Turn Red;
+			lines1[i].Color() = {1,0,0,1}; //Turn Red;
 		else
-			m_pBrick->getLines()[i].Color() = {0,0,0,1}; //Turn Red
+			lines1[i].Color() = {0,0,0,1}; //Turn Black
 	}
-}
-
-//Algebra
-void BouncingScene::CollisionPointAlg(Line line1, Line line2)
-{
-	float l1x0 = line1.Start().x;
-	float l1x1 = line1.End().x;
-	float l1y0 = line1.Start().y;
-	float l1y1 = line1.End().y;
-
-	float l2x0 = line2.Start().x;
-	float l2x1 = line2.End().x;
-	float l2y0 = line2.Start().y;
-	float l2y1 = line2.End().y;
-
-
-	//m = y1-y0/x1-x0
-	float l1m = (l1y1 - l1y0)/(l1x1-l1x0);
-	float l2m = (l2y1 - l2y0)/(l2x1-l2x0);
-
-	//point of intersection
-
-	//Line equation  y - y0 = m(x - x0)
-	//y = mx - mx0 + y0
-	//m1x - m1l1x0 + l1y0 = m2x - m2l2x0 + l2y0
-	//(m1 - m2)x = -m2l2x0 + l2y0 + m1l1x0 - l1y0
-	//x = (-m2l2x0 + l2y0 + m1l1x0 - l1y0) / (m1 - m2)
-	//y = m1x - m1l1x0 + l1y0
-	float x = (-l2m*l2x0 + l2y0 + l1m*l1x0 - l1y0)/(l1m - l2m);
-	float y = l1m*x - l1m*l1x0 + l1y0;
-
-	Util::DrawCircle({x,y},10,{0,0,0,1});
+	return collision;
 }
 
 glm::vec2 BouncingScene::CollisionPoint(Line line1, Line line2)
@@ -185,6 +198,8 @@ void BouncingScene::GUI_Function() const
 	{
 		m_GenPolygon->ChangePolygon(*m_pNumberVertices);
 	}
+	ImGui::InputFloat("Energy Loss", Absorbtion, 0.05f);
+	
 
 	ImGui::Separator();
 	if(ImGui::Button("Level 1"))

@@ -10,6 +10,8 @@ Brick::Brick()
 	Position = {Config::SCREEN_WIDTH * 0.2, Config::SCREEN_HEIGHT * 0.7};
 	Vertices = new glm::vec2[4];
 	lines = new UnorderedArray<Line>(4);
+	readyToCollide = true;
+	time = 0.0f;
 	
 	GenerateVertices();
 	GenerateLines();
@@ -31,7 +33,22 @@ void Brick::Draw()
 
 void Brick::Update()
 {
-	//LOL
+
+}
+
+
+glm::vec2 Brick::GetPosition()
+{
+	return Position;
+}
+
+float Brick::GetHeight()
+{
+	return height;
+}
+float Brick::GetWidth()
+{
+	return width;
 }
 
 void Brick::GenerateVertices()

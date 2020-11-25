@@ -15,12 +15,17 @@ public:
 	glm::vec2* GetVertices();
 	void SetColor(glm::vec4 newColor);
 	UnorderedArray<Line>& getLines();
+	
+	glm::vec2 GetPosition();
+	float GetHeight();
+	float GetWidth();
 private:
 	
 	void GenerateVertices();
 	void GenerateLines();
 	void UpdateLinesPoisition();
 private:
+
 	glm::vec4 color;
 	float height;
 	float width;
