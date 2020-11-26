@@ -38,11 +38,13 @@ private:
 	void GUI_Function() const;
 	glm::vec2* m_pMousePos;
 	float* Absorbtion;
+	bool* drawCollisionPoints;
 	
 	Brick* m_pBrick;
 	GenericPolygon* m_GenPolygon;
 	Borders* m_borders;
 	UnorderedArray<CPoints>* CollisionPoints;
+	UnorderedArray<CPoints>* CollisionPointsDraw;
 	int* m_pNumberVertices;
 
 };

@@ -123,6 +123,7 @@ public:
 		{
 			Velocity = absortion*glm::vec2(Velocity.x, Velocity.y*-1.f);
 		}
+		angleSpeed *= absortion;
 	}
 
 	glm::vec2 getPosition()
@@ -167,7 +168,7 @@ public:
 			break;
 		}
 	}
-	glm::vec2 GetVelocity()
+	glm::vec2& GetVelocity()
 	{
 		return Velocity;
 	}
@@ -221,20 +222,20 @@ public:
 			return;
 		if(vel.x> 0 && dy>0 || vel.x<0 && dy < 0)
 		{
-			tempAngle -= atan2(vel.x, dy);
+			tempAngle -= abs(atan2(vel.x, dy));
 		}
 		else
 		{
-			tempAngle += atan2(vel.x, dy);
+			tempAngle += abs(atan2(vel.x, dy));
 		}
 
 		if(vel.y> 0 && dx>0 || vel.y<0 && dx < 0)
 		{
-			tempAngle -= atan2(vel.y, dx);
+			tempAngle -= abs(atan2(vel.y, dx));
 		}
 		else
 		{
-			tempAngle += atan2(vel.y, dx);
+			tempAngle += abs(atan2(vel.y, dx));
 		}
 		//if Vx positive and dy is positive rotation is negative
 		//if Vx negative and dy is positive rotation is positive
@@ -247,6 +248,11 @@ public:
 		//if Vy negative and dx is negative rotation is negative
 		if(abs(angleSpeed) < 3.1416f * 2.f)
 			angleSpeed += tempAngle;
+	}
+
+	float& getAngleSpeed()
+	{
+		return angleSpeed;
 	}
 private:
 	void GenerateVertices()

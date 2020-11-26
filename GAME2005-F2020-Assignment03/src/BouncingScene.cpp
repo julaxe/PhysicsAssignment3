@@ -29,9 +29,12 @@ void BouncingScene::draw()
 	m_pBrick->Draw();
 	m_GenPolygon->Draw();
 	Util::DrawLine(m_pMousePos[0], m_pMousePos[1], {1,0,0,1});
-	for (int i = 0; i < CollisionPoints->GetSize(); i++)
+	if((*drawCollisionPoints))
 	{
-		Util::DrawCircle((*CollisionPoints)[i].Position, 10, {0,0,0,1});
+		for (int i = 0; i < CollisionPointsDraw->GetSize(); i++)
+		{
+			Util::DrawCircle((*CollisionPointsDraw)[i].Position, 10, {0,0,0,1});
+		}
 	}
 
 	if (EventManager::Instance().isIMGUIActive())
@@ -43,57 +46,64 @@ void BouncingScene::draw()
 void BouncingScene::update()
 {
 	CollisionPoints->clear();
+	CollisionPointsDraw->clear();
 	
 	if(checkCollision(m_pBrick->getLines(), m_GenPolygon->getLines())) //collision with brick
 	{
-		if(CollisionPoints->GetSize() > 1)//for the collision with the vertices
+		if(!(*drawCollisionPoints))
 		{
-			for (int i = 0; i < 3; i++)
+			if(CollisionPoints->GetSize() > 1)//for the collision with the vertices
 			{
-				if((*CollisionPoints)[0].Line == i && (*CollisionPoints)[1].Line == i+1)
+				for (int i = 0; i < 3; i++)
 				{
-					m_GenPolygon->DiagonalDirection(i+1, m_pBrick);
+					if((*CollisionPoints)[0].Line == i && (*CollisionPoints)[1].Line == i+1)
+					{
+						m_GenPolygon->DiagonalDirection(i+1, m_pBrick);
+					}
 				}
+				if((*CollisionPoints)[0].Line == 0 && (*CollisionPoints)[1].Line == 3)
+				{
+					m_GenPolygon->DiagonalDirection(0, m_pBrick);
+				}
+				
 			}
-			if((*CollisionPoints)[0].Line == 0 && (*CollisionPoints)[1].Line == 3)
+			else
 			{
-				m_GenPolygon->DiagonalDirection(0, m_pBrick);
+				BounceWithCollisionLines((*CollisionPoints)[0], true);
 			}
-			
-		}
-		else
-		{
-			BounceWithCollisionLines((*CollisionPoints)[0], true);
-		}
 
-		//add velocity
-		glm::vec2 velocityBrick = (m_pMousePos[0] - m_pMousePos[1])/(1.f/60.f);
-		m_GenPolygon->addVelocity(velocityBrick);
-		m_pBrick->SetVelocity(velocityBrick); // just to save it inside the brick
+			//add velocity
+			glm::vec2 velocityBrick = (m_pMousePos[0] - m_pMousePos[1])/(1.f/60.f);
+			m_GenPolygon->addVelocity(velocityBrick);
+			m_pBrick->SetVelocity(velocityBrick); // just to save it inside the brick
 
-		//add rotation
-		for (int i = 0; i < CollisionPoints->GetSize(); i++)
-		{
-			m_GenPolygon->CalculateRotation((*CollisionPoints)[i].Position,
-				m_pBrick->GetVelocity());
+			//add rotation
+			for (int i = 0; i < CollisionPoints->GetSize(); i++)
+			{
+				m_GenPolygon->CalculateRotation((*CollisionPoints)[i].Position,
+					m_pBrick->GetVelocity());
+			}
 		}
 	}
+
 	CollisionPoints->clear();
 	
 	if(checkCollision(m_borders->getLines(), m_GenPolygon->getLines())) // collision with borders
 	{
-		for (int i = 0; i < CollisionPoints->GetSize(); i++)
+		if(!(*drawCollisionPoints))
 		{
-			BounceWithCollisionLines((*CollisionPoints)[i], false);
-		}
-		//add rotation
-		for (int i = 0; i < CollisionPoints->GetSize(); i++)
-		{
-			m_GenPolygon->CalculateRotation((*CollisionPoints)[i].Position,
-				m_pBrick->GetVelocity());
+			for (int i = 0; i < CollisionPoints->GetSize(); i++)
+			{
+				BounceWithCollisionLines((*CollisionPoints)[i], false);
+			}
+			//add rotation
+			for (int i = 0; i < CollisionPoints->GetSize(); i++)
+			{
+				m_GenPolygon->CalculateRotation((*CollisionPoints)[i].Position,
+					m_pBrick->GetVelocity());
+			}
 		}
 	}
-
 	m_pBrick->Update();
 	m_GenPolygon->Update();
 }
@@ -127,7 +137,9 @@ void BouncingScene::start()
 	m_GenPolygon = new GenericPolygon(*m_pNumberVertices,50);
 	m_borders = new Borders();
 	CollisionPoints = new UnorderedArray<CPoints>(3);
+	CollisionPointsDraw = new UnorderedArray<CPoints>(3);
 	Absorbtion = new float(0.9f);
+	drawCollisionPoints = new bool(false);
 }
 
 void BouncingScene::BounceWithCollisionLines(CPoints collisionPoint, bool isBrick)
@@ -162,6 +174,7 @@ bool BouncingScene::checkCollision(UnorderedArray<Line>& lines1, UnorderedArray<
 				LineColliding = true;
 				//Check exactly position
 				CollisionPoints->push(CPoints(CollisionPoint(lines1[i],lines2[k]), i));
+				CollisionPointsDraw->push(CPoints(CollisionPoint(lines1[i],lines2[k]), i));
 				break;
 			}
 		}
@@ -221,13 +234,19 @@ void BouncingScene::GUI_Function() const
 	ImGui::Text("1 pixel is 1 meter");
 	
 	ImGui::Separator();
-	if(ImGui::InputInt("Polygon", m_pNumberVertices))
+	if(ImGui::SliderInt("Polygon", m_pNumberVertices,3,15))
 	{
 		m_GenPolygon->ChangePolygon(*m_pNumberVertices);
 	}
-	ImGui::InputFloat("Energy Loss", Absorbtion, 0.05f);
-	
-
+	ImGui::SliderFloat("Energy Loss", Absorbtion, 0.05f,1.f);
+	if(ImGui::Checkbox("Show Collision Points", drawCollisionPoints))
+	{
+		m_GenPolygon->GetVelocity() = {0,0};
+		m_GenPolygon->getAngleSpeed() = 0;
+	}
+	ImGui::Separator();
+	ImGui::LabelText("Speed [m/s]",std::to_string(Util::magnitude(m_GenPolygon->GetVelocity())).c_str());
+	ImGui::LabelText("Rotation Speed [rad/s]",std::to_string(m_GenPolygon->getAngleSpeed()).c_str());
 	ImGui::Separator();
 	if(ImGui::Button("Level 1"))
 	{
