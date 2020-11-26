@@ -53,8 +53,10 @@ public:
 		Velocity = {0,0};
 		lines = new UnorderedArray<Line>(NumberOfVeritces);
 		color = {0,0,0,1}; //Black default
-		MAX_VELOCITY = 300.f
-		;
+		MAX_VELOCITY = 300.f;
+		angle = 0;
+		angleSpeed = 0;
+		
 		GenerateVertices();
 		UpdateVerticesPosition();
 		GenerateLines();
@@ -76,6 +78,7 @@ public:
 	{
 		float deltaTime = 1.f/60.0f;
 		Position += Velocity*deltaTime;
+		angle += angleSpeed*deltaTime;
 		
 		GenerateVertices();
 		UpdateVerticesPosition();
@@ -168,20 +171,97 @@ public:
 	{
 		return Velocity;
 	}
+
+	void DiagonalDirection(int vertice, Brick* brick)
+	{
+		float speed = Util::magnitude(Velocity);
+		glm::vec2 direction = {0,0};
+		glm::vec2 newPos = {0,0};
+		glm::vec2 center = brick->GetPosition();
+		switch (vertice)
+		{
+		case 0:
+			direction = Util::normalize({-1,-1});
+			newPos = {center.x - brick->GetWidth()*0.5 - 1,
+				center.y - brick->GetHeight()*0.5  - 1};
+			break;
+		case 1:
+			direction = Util::normalize({1,-1});
+			newPos = {center.x + brick->GetWidth()*0.5 + 1,
+				center.y - brick->GetHeight()*0.5  - 1};
+			break;
+		case 2:
+			direction = Util::normalize({1,1});
+			newPos = {center.x + brick->GetWidth()*0.5 + 1,
+				center.y + brick->GetHeight()*0.5  + 1};
+			break;
+		case 3:
+			direction = Util::normalize({-1,1});
+			newPos = {center.x - brick->GetWidth()*0.5 - 1,
+				center.y + brick->GetHeight()*0.5  + 1};
+			break;
+		default:
+			break;
+			
+		}
+		
+		newPos = newPos + (direction * (float)radius);
+		Position = newPos;
+		Velocity = direction*speed;
+	}
+	void CalculateRotation(glm::vec2 Point, glm::vec2 vel)
+	{
+		float dx = Position.x - Point.x;
+		float dy = Position.y - Point.y;
+		float tempAngle = 0; //in radians
+
+		//if dx positive: collision left side
+		//if dy positive: collision top side
+		if(Util::magnitude(vel) == 0.0f)
+			return;
+		if(vel.x> 0 && dy>0 || vel.x<0 && dy < 0)
+		{
+			tempAngle -= atan2(vel.x, dy);
+		}
+		else
+		{
+			tempAngle += atan2(vel.x, dy);
+		}
+
+		if(vel.y> 0 && dx>0 || vel.y<0 && dx < 0)
+		{
+			tempAngle -= atan2(vel.y, dx);
+		}
+		else
+		{
+			tempAngle += atan2(vel.y, dx);
+		}
+		//if Vx positive and dy is positive rotation is negative
+		//if Vx negative and dy is positive rotation is positive
+		//if Vx positive and dy is negative rotation is positive
+		//if Vx negative and dy is negative rotation is negative
+
+		//if Vy positive and dx is positive rotation is negative
+		//if Vy negative and dx is positive rotation is positive
+		//if Vy positive and dx is negative rotation is positive
+		//if Vy negative and dx is negative rotation is negative
+		if(abs(angleSpeed) < 3.1416f * 2.f)
+			angleSpeed += tempAngle;
+	}
 private:
 	void GenerateVertices()
 	{
 		Vertices->clear();
 		if(NVertices >= 3)
 		{
-			float const Constangle = 360/NVertices;
-			float angle = 20;
+			float const Constangle = (360/NVertices) * Util::Deg2Rad;
+			float tempAngle = 0;
 			
 			for (int i = 0; i < NVertices; i++)
 			{
-				glm::vec2 newVertice = {radius*cos(angle* Util::Deg2Rad), radius*sin(angle* Util::Deg2Rad)};
+				glm::vec2 newVertice = {radius*cos(angle+ tempAngle), radius*sin(angle + tempAngle)};
 				Vertices->push(newVertice);
-				angle += Constangle;
+				tempAngle += Constangle;
 			}
 		}
 	}
@@ -205,6 +285,8 @@ private:
 private:
 	int radius;
 	int NVertices;
+	float angle;
+	float angleSpeed;
 	float MAX_VELOCITY;
 	glm::vec2 Position;
 	glm::vec2 Velocity;

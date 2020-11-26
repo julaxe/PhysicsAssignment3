@@ -12,11 +12,15 @@ public:
 	void Update();
 
 	void SetPosition(glm::vec2 newPos);
+	glm::vec2 GetPosition();
+	void SetVelocity(glm::vec2 newVel);
+	glm::vec2 GetVelocity();
 	glm::vec2* GetVertices();
 	void SetColor(glm::vec4 newColor);
 	UnorderedArray<Line>& getLines();
 	
-	glm::vec2 GetPosition();
+	
+	
 	float GetHeight();
 	float GetWidth();
 private:
@@ -30,6 +34,7 @@ private:
 	float height;
 	float width;
 	glm::vec2 Position;
+	glm::vec2 Velocity;
 	glm::vec2* Vertices;
 	UnorderedArray<Line>* lines;
 };

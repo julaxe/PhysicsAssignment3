@@ -8,10 +8,9 @@ Brick::Brick()
 	width = 75.f;
 	color = {0,0,0,1};
 	Position = {Config::SCREEN_WIDTH * 0.2, Config::SCREEN_HEIGHT * 0.7};
+	Velocity = {0,0};
 	Vertices = new glm::vec2[4];
 	lines = new UnorderedArray<Line>(4);
-	readyToCollide = true;
-	time = 0.0f;
 	
 	GenerateVertices();
 	GenerateLines();
@@ -40,6 +39,11 @@ void Brick::Update()
 glm::vec2 Brick::GetPosition()
 {
 	return Position;
+}
+
+void Brick::SetVelocity(glm::vec2 newVel)
+{
+	Velocity = newVel;
 }
 
 float Brick::GetHeight()
@@ -85,6 +89,11 @@ void Brick::SetPosition(glm::vec2 newPos)
 	Position = newPos;
 	GenerateLines();
 	UpdateLinesPoisition();
+}
+
+glm::vec2 Brick::GetVelocity()
+{
+	return Velocity;
 }
 
 glm::vec2* Brick::GetVertices()

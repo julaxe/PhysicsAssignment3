@@ -44,26 +44,53 @@ void BouncingScene::update()
 {
 	CollisionPoints->clear();
 	
-	if(checkCollision(m_pBrick->getLines(), m_GenPolygon->getLines()))
+	if(checkCollision(m_pBrick->getLines(), m_GenPolygon->getLines())) //collision with brick
 	{
-		for (int i = 0; i < CollisionPoints->GetSize(); i++)
+		if(CollisionPoints->GetSize() > 1)//for the collision with the vertices
 		{
-			BounceWithCollisionLines((*CollisionPoints)[i], true);
+			for (int i = 0; i < 3; i++)
+			{
+				if((*CollisionPoints)[0].Line == i && (*CollisionPoints)[1].Line == i+1)
+				{
+					m_GenPolygon->DiagonalDirection(i+1, m_pBrick);
+				}
+			}
+			if((*CollisionPoints)[0].Line == 0 && (*CollisionPoints)[1].Line == 3)
+			{
+				m_GenPolygon->DiagonalDirection(0, m_pBrick);
+			}
+			
 		}
-		
-		
+		else
+		{
+			BounceWithCollisionLines((*CollisionPoints)[0], true);
+		}
+
 		//add velocity
 		glm::vec2 velocityBrick = (m_pMousePos[0] - m_pMousePos[1])/(1.f/60.f);
 		m_GenPolygon->addVelocity(velocityBrick);
-		m_pBrick->ReadyToCollide() = false;
+		m_pBrick->SetVelocity(velocityBrick); // just to save it inside the brick
+
+		//add rotation
+		for (int i = 0; i < CollisionPoints->GetSize(); i++)
+		{
+			m_GenPolygon->CalculateRotation((*CollisionPoints)[i].Position,
+				m_pBrick->GetVelocity());
+		}
 	}
 	CollisionPoints->clear();
 	
-	if(checkCollision(m_borders->getLines(), m_GenPolygon->getLines()))
+	if(checkCollision(m_borders->getLines(), m_GenPolygon->getLines())) // collision with borders
 	{
 		for (int i = 0; i < CollisionPoints->GetSize(); i++)
 		{
 			BounceWithCollisionLines((*CollisionPoints)[i], false);
+		}
+		//add rotation
+		for (int i = 0; i < CollisionPoints->GetSize(); i++)
+		{
+			m_GenPolygon->CalculateRotation((*CollisionPoints)[i].Position,
+				m_pBrick->GetVelocity());
 		}
 	}
 
