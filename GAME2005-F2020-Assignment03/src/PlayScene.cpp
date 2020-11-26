@@ -106,6 +106,8 @@ void PlayScene::start()
 
 	// Bullet Pool
 	m_pBulletPool = new BulletPool(10);
+
+	SoundManager::Instance().load("../Assets/audio/thud2.wav", "Hit", SOUND_SFX);
 	
 }
 

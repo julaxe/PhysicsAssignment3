@@ -1,6 +1,7 @@
 #include "Bullet.h"
 #include "DoubleLinkedList.h"
 #include "UnOrderedArray.h"
+#include "SoundManager.h"
 #include <iostream>
 class BulletPool
 {
@@ -67,6 +68,7 @@ public:
 					(Player->getHeight()*0.3 + List->getArray()[i]->getHeight()*0.5))
 				{
 					List->getArray()[i]->isNotUsed();
+					SoundManager::Instance().playSound("Hit");
 				}
 			}
 		}
